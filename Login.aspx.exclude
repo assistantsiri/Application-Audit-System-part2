@@ -1,0 +1,165 @@
+﻿<%@ Page Language="C#" AutoEventWireup="true" CodeFile="Login.aspx.cs" Inherits="Login" %>
+
+<!DOCTYPE html>
+
+ 
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title>AAS</title>
+    <%-- <link href="App_Themes\AAS\StyleSheet1.css" rel="stylesheet" type="text/css" />--%>
+
+    <%--<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-rBsXv8V0Uo+VWVxEhj7Fq0ZjbJ5zoO5DP8jKtScF9x6u49MFaAMiCuRu1YKXPW1i" crossorigin="anonymous"></script>--%>
+
+    <link href="Content/Plugins/Bootstrap4.3.1/css/bootstrap.min.css" rel="stylesheet" />
+      <link href="Content/css/bootstrap/StyleSheet.css" rel="stylesheet" />
+  
+
+
+   <style>
+        .bg-glass {
+            background-color: hsla(0, 0 %, 100 %, 0.9)!important;
+            backdrop-filter: saturate(200 %) blur(25px);
+             
+        }
+
+      
+.card {
+
+    padding: 150px 0px !important;
+    margin-top: 90px;
+    margin-bottom: 60px;
+    border: none !important;
+    box-shadow: 0 6px 12px 0 rgba(0,0,0,0.2);
+    margin-left: 800px;
+    background-image: url('http://localhost:60164/Images/Syndicate-Bank-Canara-Bank.png');
+    background-size: 350px; 
+    background-position: top;
+    background-repeat: no-repeat;
+    border-radius: 10px;
+    /* background-image: linear-gradient(180deg, #019EEC, #FFB600);*/
+           
+
+}
+
+      .container {
+
+        background-image: url(http://localhost:60164/Images/ApplicationAudit1.jpg);
+        background-position: left;
+        background-repeat: no-repeat;
+        width: auto;
+    }
+
+      .accordion-header
+      {
+          background-image: linear-gradient(180deg, #019EEC, #FFB600);
+
+       /*   background-image: repeating-radial-gradient(red, yellow 10%, green 15%);*/
+          height:100px;
+      }
+      
+      #form1{
+         background-image: linear-gradient(180deg, #019EEC, #FFB600);
+      }
+      
+   </style>
+        
+    <meta content="BlendTrans(Duration=0.1)" http-equiv="Page-Exit" />
+  
+    <script language="javascript" type="text/javascript">
+        
+       
+      
+       
+    </script>
+</head>
+<body>
+    <form id="form1" runat="server">
+   <asp:ScriptManager ID="ScriptManager1" runat="server">
+       
+        </asp:ScriptManager>
+
+
+           <asp:UpdatePanel ID="UpdatePanel1" runat="server">
+        <contenttemplate>
+            <div class="accordion-header">
+                <div class="col-12" style="color:white">
+
+                    <div class="row">
+                        <div class="col-4" ">
+                          <%--  <img src="Images/CanaraBank.gif" />--%>
+                        </div>
+                        <div class="col-4">
+
+                            <h1><b>Application Audit System</b> </h1>
+                        </div>
+                   </div>
+                 </div>
+              </div>
+   </contenttemplate>
+    </asp:UpdatePanel>
+
+        <div class="container px-4 py-0 px-md-0 text-center text-lg-start my-5">
+           
+    <div class="card bg-glass row p-5">
+        
+        <div class=" col-md-12">
+            <form>
+                <div class="form-group row">
+                    <label for="txtUserID" class="col-md-3 col-form-label">User ID</label>
+                    <div class="col-md-6">
+                        <asp:TextBox ID="txtUserID" runat="server" CssClass="form-control" Width="100%" OnTextChanged="txtUserID_TextChanged" AutoPostBack="True" AutoCompleteType="Disabled" AutoComplete="off"></asp:TextBox>
+                        <asp:RequiredFieldValidator ID="rqrdCode" runat="server" ControlToValidate="txtUserID" ErrorMessage="Enter UserID" ForeColor="#FF3300" ValidationGroup="FormValidation">*</asp:RequiredFieldValidator>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label for="ddlauditType" class="col-md-3 col-form-label">Select Post Audit/Pre-Audit</label>
+                    <div class="col-md-6">
+                        <asp:DropDownList ID="ddlauditType" runat="server" CssClass="form-control" AutoPostBack="true" OnSelectedIndexChanged="ddlauditType_SelectedIndexChanged">
+                            <asp:ListItem Value="0">---Select---</asp:ListItem>
+                            <asp:ListItem Value="1">Pre-Application Audit</asp:ListItem>
+                            <asp:ListItem Value="2">Post-Application Audit</asp:ListItem>
+                        </asp:DropDownList>
+                        <asp:RequiredFieldValidator ID="RequiredFieldValidator1" runat="server" ControlToValidate="ddlauditType" ErrorMessage="Select Audit type" ForeColor="#FF3300" ValidationGroup="FormValidation">*</asp:RequiredFieldValidator>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label for="txtPwd" class="col-md-3 col-form-label">Password</label>
+                    <div class="col-md-6">
+                        <asp:TextBox ID="txtPwd" runat="server" CssClass="form-control" Width="100%" MaxLength="50" TextMode="Password"></asp:TextBox>
+                        <asp:RequiredFieldValidator ID="rqrdPwd" runat="server" ControlToValidate="txtPwd" ErrorMessage="Enter Password" ForeColor="#FF3300" ValidationGroup="FormValidation">*</asp:RequiredFieldValidator>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label for="ddlauditid" class="col-md-3 col-form-label">Audit Id</label>
+                    <div class="col-md-6">
+                        <asp:DropDownList ID="ddlauditid" runat="server" style="width:150px"></asp:DropDownList>
+                        <asp:RequiredFieldValidator ID="rqrdPwd0" runat="server" ControlToValidate="ddlauditid" ErrorMessage="Select Audit Id" ForeColor="#FF3300" ValidationGroup="FormValidation">*</asp:RequiredFieldValidator>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <div class="col-md-9 offset-md-3">
+                        <asp:Button ID="btnUpdate" runat="server" CssClass="btn btn-primary" Text="Login" OnClick="btnLogin_Click" ValidationGroup="FormValidation" />
+                        <asp:Button ID="btnCancel" runat="server" CssClass="btn btn-secondary" Text="Cancel" OnClick="btnCancel_Click" CausesValidation="False" />
+                    </div>
+                </div>
+            </form>
+              
+      </div>
+   </div>
+     <footer class="Footer" style="width:auto">
+        <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.2);">
+            &copy; 2024 Canbank Computer Services Ltd
+        </div>
+    </footer>
+ </div>
+        
+     
+</form>
+</body> 
+</html>
+

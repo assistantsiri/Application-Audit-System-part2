@@ -1,0 +1,369 @@
+﻿using System;
+using System.Data;
+using System.Configuration;
+using System.Collections;
+using System.Web;
+using System.Web.Security;
+using System.Web.UI;
+using System.Web.UI.WebControls;
+using System.Web.UI.WebControls.WebParts;
+using System.Web.UI.HtmlControls;
+using BO;
+using BL;
+public partial class Login : System.Web.UI.Page
+{
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        if (!IsPostBack)
+        {
+            txtUserID.Focus();
+            
+        }
+
+    }
+
+    protected void btnLogin_Click(object sender, EventArgs e)
+    {
+        Session["StaffNum"] = txtUserID.Text;
+        UserMaintenanceBAL objBL = new UserMaintenanceBAL();
+        UserMaintenanceBO objBO = new UserMaintenanceBO();
+        objBO.StaffNo = txtUserID.Text;
+        objBO.UpdtDt = DateTime.Now.ToString("dd-MMM-yyyy");
+        //objBO.M_AUDIT_type1 = ddlauditType.SelectedItem.Text;
+        DataTable dTAudit = new DataTable();
+        dTAudit = objBL.FetchAuditId(objBO);
+        if (dTAudit.Rows.Count > 0)
+        {
+            if (Convert.ToInt16(dTAudit.Rows[0]["AAT_AASAUDITID"]) == 0)
+            {
+                Session["VauditId"] = 0;
+
+            }
+            else
+            {
+                Session["VauditId"] = Convert.ToInt16(dTAudit.Rows[0]["AAT_AASAUDITID"]);
+            }
+
+        }
+
+
+        //Added shwetha On 14-11-2016
+        if (Convert.ToInt16(Session["DeptId"].ToString()) == 1)
+        {
+            if ((Convert.ToInt16(Session["RoleId"].ToString()) != 1 && Convert.ToInt16(Session["RoleId"].ToString()) != 9) && Convert.ToInt16(Session["RoleId"].ToString()) == 2)
+
+            {
+                //Modified on 11-08-2017 as per feedbacks given (to generate reports after conclude Audit)
+                if (ddlauditid.SelectedValue == "0")
+                {
+                    Response.Redirect("CompletedAuditReports.aspx");
+                }
+                //11-08-2017
+                //if (ddlauditid.SelectedItem.Text == "Completed Audit Reports")
+
+                if (Convert.ToInt32(Session["VauditId"].ToString()) != 0)
+                {
+                    ViewState["AuditId"] = Convert.ToInt32(Session["VauditId"].ToString());
+                }
+                else
+                {
+                    ScriptManager.RegisterClientScriptBlock(this, this.GetType(), "alertMessage", "alert('User Not Inducted for Audit.')", true);
+                    return;
+                }
+            }
+        }
+
+
+        if ((Convert.ToInt16(Session["RoleId"].ToString()) == 2 && Convert.ToInt16(Session["DeptId"].ToString()) == 1))
+        {
+            Session["VauditId"] = Convert.ToInt32(ddlauditid.SelectedValue);
+        }
+
+
+        objBO.auditid = Convert.ToInt32(Session["VauditId"]);
+        objBO.StaffNo = txtUserID.Text;
+        DataTable dTableLog = objBL.FetchUserMastLog(objBO);
+        string Logattempt = Convert.ToString(dTableLog.Rows[0]["AUL_LOG_ATTEMPT"]);
+        DataTable dTable = objBL.FetchUserMast(objBO);
+        if (dTable.Rows.Count > 0)
+        {
+            String Password = Convert.ToString(dTable.Rows[0]["AUM_PWD"]);
+
+            string pwd = Globals.Decryptdata(Password);
+
+            if (Globals.Decryptdata(Password) != txtPwd.Text)
+            {
+
+                String sMessage = "Invalid Password..";
+                ScriptManager.RegisterStartupScript(this, typeof(Page), "Alert", "<script>alert('" + sMessage + "');</script>", false);
+                return;
+
+            }
+        }
+        if (Convert.ToString(Logattempt) == "")
+        {
+            Logattempt = "0";
+        }
+        if (Logattempt == "0")
+        {
+            Response.Redirect("ChangePassword1.aspx");
+        }
+
+        //DataTable dTable = objBL.FetchUserMast(objBO);
+        //if (dTable.Rows.Count > 0)
+        //{
+        //    String Password = Convert.ToString(dTable.Rows[0]["AUM_PWD"]);
+
+
+
+        //    if (Globals.Decryptdata(Password) != txtPwd.Text)
+        //    {
+
+        //        String sMessage = "Invalid Password..";
+        //        ScriptManager.RegisterStartupScript(this, typeof(Page), "Alert", "<script>alert('" + sMessage + "');</script>", false);
+
+        //    }
+        if (ddlauditType.SelectedItem.Text == "Pre-Application Audit")
+        {
+            objBO.Action = "U";
+            Byte i = objBL.SaveUpdateLoginattempt(objBO);
+            Response.Redirect("HomePage.aspx");
+        }
+
+        else if (ddlauditType.SelectedItem.Text == "Post-Application Audit")
+        {
+            objBO.Action = "U";
+            Byte i = objBL.SaveUpdateLoginattempt(objBO);
+            Response.Redirect("PostAudit.aspx");
+        }
+
+
+    }
+
+    //if (dTableLog.Rows.Count > 0)
+    //      {
+    //          DataTable dTLog = new DataTable();
+
+    //          dTLog = objBL.FetchLoginattempts(objBO);
+    //          if (dTLog.Rows.Count > 0)
+    //          {
+    //              objBO.Action = "U";
+    //          }
+    //          else
+    //          {
+    //              objBO.Action = "I";
+    //          }
+
+    public string StrMonth(string strMon)
+    {
+
+        string output = string.Empty;
+
+        if (strMon == "01")
+        {
+            strMon = "JAN";
+        }
+        else if (strMon == "02")
+        {
+            strMon = "FEB";
+        }
+        else if (strMon == "03")
+        {
+            strMon = "MAR";
+        }
+        else if (strMon == "04")
+        {
+            strMon = "APR";
+        }
+        else if (strMon == "05")
+        {
+            strMon = "MAY";
+        }
+        else if (strMon == "06")
+        {
+            strMon = "JUN";
+        }
+        else if (strMon == "07")
+        {
+            strMon = "JUL";
+        }
+        else if (strMon == "08")
+        {
+            strMon = "AUG";
+        }
+        else if (strMon == "09")
+        {
+            strMon = "SEP";
+        }
+        else if (strMon == "10")
+        {
+            strMon = "OCT";
+        }
+        else if (strMon == "11")
+        {
+            strMon = "NOV";
+        }
+        else if (strMon == "12")
+        {
+            strMon = "DEC";
+        }
+
+        return strMon;
+
+    }
+    private void FillAuditId()
+    {
+        UserMaintenanceBAL objBL = new UserMaintenanceBAL();
+        UserMaintenanceBO objBO = new UserMaintenanceBO();
+
+        try
+        {
+            if (ddlauditType.SelectedValue == "1")
+            {
+                objBO.Action = "A";
+            }
+            else if (ddlauditType.SelectedValue == "2")
+            {
+                objBO.Action = "B";
+            }
+            else if (ddlauditType.SelectedValue == "0")
+            {
+                //String sMessage = "Select Post Audit/Pre-Audit";
+                //ScriptManager.RegisterStartupScript(this, typeof(Page), "Alert", "<script>alert('" + sMessage + "');</script>", false);
+               // return;
+            }
+            objBO.StaffNo = txtUserID.Text;
+            DataTable dtable = objBL.AudtidIdLoad(objBO);
+            ddlauditid.DataSource = dtable;
+            ddlauditid.DataValueField = "aat_aasauditid";
+            ddlauditid.DataTextField = "appname";
+            ddlauditid.DataBind();
+            ddlauditid.Items.Insert(0, new ListItem("--Select--", ""));
+            //Modified on 11-08-2017 as per feedbacks given (to generate reports after conclude Audit)
+            ddlauditid.Items.Insert(1, new ListItem("Completed Audit Reports", "0"));
+        }
+        catch (Exception ex)
+        {
+            ScriptManager.RegisterClientScriptBlock(this, this.GetType(), "alertMessage", "alert(" + ex.Message.ToString() + ")", true);
+        }
+        finally
+        {
+            objBL = null;
+            ddlauditid = null;
+        }
+    }
+
+    protected void txtUserID_TextChanged(object sender, EventArgs e)
+    {
+
+        UserMaintenanceBAL objBL = new UserMaintenanceBAL();
+        UserMaintenanceBO objBO = new UserMaintenanceBO();
+        string s = txtUserID.Text.Trim();
+        string UserID = s.Replace("'", " ");
+        objBO.StaffNo = UserID;
+        try
+        {
+
+
+
+            //  Int16 UserLength = Convert.ToInt16(txtUserID.Text.Length);
+            //if ((UserLength >=5) && (UserLength >=6))
+            //{
+            //    string message = "User ID Should be of length 5 or 6 ";
+            //    ClientScript.RegisterStartupScript(this.GetType(), "myalert", "alert('" + message + "');", true);
+            //    txtUserID.Text = "";
+            //    return;
+            //}
+            objBO.Action = "D";
+            DataTable dTable = objBL.FetchUserDtls(objBO);
+
+            if (dTable.Rows.Count == 0)
+            {
+                string message = "Invalid Staff ID ";
+                ClientScript.RegisterStartupScript(this.GetType(), "myalert", "alert('" + message + "');", true);
+                txtUserID.Text = "";
+            }
+
+            else
+            {
+                Session["DeptId"] = Convert.ToInt16(dTable.Rows[0]["AUM_DEPT"]);
+                Session["RoleId"] = Convert.ToInt16(dTable.Rows[0]["AUM_ROLE"]);
+                Session["Designation"] = Convert.ToInt16(dTable.Rows[0]["AUM_DESIGNATION"]);
+                Session["Section"] = Convert.ToString(dTable.Rows[0]["AUM_SECTION"]);
+                Session["SectionName"] = Convert.ToString(dTable.Rows[0]["secname"]);
+                Session["WingName"] = Convert.ToString(dTable.Rows[0]["wing"]);
+                String UpdtStatus = Convert.ToString(dTable.Rows[0]["AUM_UPDT_STAT"]).ToString();
+                String Status = Convert.ToString(dTable.Rows[0]["AUM_STATUS"]).ToString();
+                String RoleId = Convert.ToString(Session["RoleId"]);
+
+
+                if ((Convert.ToInt16(Session["RoleId"].ToString()) == 2 && Convert.ToInt16(Session["DeptId"].ToString()) == 1))
+                {
+                   // lblauditid.Visible = true;
+                    ddlauditid.Visible = true;
+                    FillAuditId();
+                }
+                else
+                {
+                   // lblauditid.Visible = false;
+                    ddlauditid.Visible = false;
+                }
+
+
+
+                if (UpdtStatus != "A" && RoleId != "1" && Status != "I")
+                {
+                    ScriptManager.RegisterClientScriptBlock(this, this.GetType(), "alertMessage", "alert('User ID has to be Authorised...')", true);
+                    txtUserID.Text = "";
+                    txtUserID.Focus();
+                }
+                else
+                {
+                    txtPwd.Focus();
+                }
+
+            }
+        }
+        catch (Exception ee)
+        {
+            Globals.Show(ee.Message.ToString());
+        }
+    }
+
+
+    //protected void txtPwd_TextChanged(object sender, EventArgs e)
+    //{
+
+
+    //}
+
+    protected void ImgBtnHome_Click(object sender, ImageClickEventArgs e)
+    {
+
+    }
+
+    protected void ImgBtnLogout_Click(object sender, ImageClickEventArgs e)
+    {
+
+    }
+
+    protected void btnCancel_Click(object sender, EventArgs e)
+    {
+        txtUserID.Text = "";
+        txtPwd.Text = "";
+      // lblauditid.Visible = false;
+        ddlauditid.Visible = false;
+    }
+
+    //protected void ddlauditType_SelectedIndexChanged(object sender, EventArgs e)
+    //{
+
+    //}
+
+
+
+    protected void ddlauditType_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        FillAuditId();
+    }
+}
